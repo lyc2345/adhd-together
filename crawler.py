@@ -1,6 +1,7 @@
 # from selenium import webdriver
 import sys
-from urllib2 import urlopen
+# from urllib2 import urlopen
+import urllib.request
 from bs4 import BeautifulSoup
 from datetime import datetime
 import time
@@ -13,7 +14,7 @@ class Route:
 
 def bus_tracker(busId):
   url = 'http://apidata.tycg.gov.tw/OPD-io/bus4/GetEstimateTime.xml?routeIds=' + busId
-  soup = BeautifulSoup(urlopen(url), 'lxml')
+  soup = BeautifulSoup(urllib.request.urlopen(url), 'lxml')
   # print(soup.prettify())
 
   route_xml = soup.route
@@ -32,8 +33,8 @@ def bus_tracker(busId):
 def getBusInformation(text):
   route = bus_tracker(text)
 
-  reload(sys)
-  sys.setdefaultencoding('utf-8')
+  # reload(sys)
+  # sys.setdefaultencoding('utf-8')
   time_format = '%H:%M'
 
   nowDate = datetime.now()
