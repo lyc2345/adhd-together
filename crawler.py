@@ -41,8 +41,9 @@ def getBusInformation(text):
   nowStr = str(nowDate.hour) + ':' + str(nowDate.minute)
   now = datetime.strptime(nowStr, time_format)
   # print(now)
-
-  busInfo = 'Back' + '\n'
+  busInfo = ''
+  busInfo += '*** Bus Route: ' + text + ' ***' + '\n'
+  busInfo += 'To NEW TPE' + '\n'
   for b in route.back:
     ct = datetime.strptime(str(b['cometime']), time_format)
     # print('cometime: ', ct)
@@ -52,7 +53,7 @@ def getBusInformation(text):
     busInfo += str(b['cometime']) + ' - ' + str(b['stopname']) + ' \n'
     # print('back: ', b)
   busInfo += '*****************************' + '\n'
-  busInfo += 'Forward' + '\n'
+  busInfo += 'Back to TAOYUAN' + '\n'
   for f in route.forward:
     busInfo += str(f['cometime']) + ' - ' + str(f['stopname']) + ' \n'
     # print('forward: ', f)
