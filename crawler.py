@@ -35,26 +35,27 @@ def getBusInformation(text):
 
   # reload(sys)
   # sys.setdefaultencoding('utf-8')
-  time_format = '%H:%M'
+  time_format = '%H:%M:%S'
 
   nowDate = datetime.now()
-  nowStr = str(nowDate.hour) + ':' + str(nowDate.minute)
+  nowStr = str(nowDate.hour) + ':' + str(nowDate.minute) + ':' + str(nowDate.second)
   now = datetime.strptime(nowStr, time_format)
   # print(now)
-  busInfo = ''
-  busInfo += '*** Bus Route: ' + text + ' ***' + '\n'
-  busInfo += 'To NEW TPE' + '\n'
+  backStr = '*** Bus Route: ' + text + ' ***' + '\n'
+  forwardStr = '*** Bus Route: ' + text + ' ***' + '\n'
+  backStr += 'To NEW TPE' + '\n'
   for b in route.back:
-    ct = datetime.strptime(str(b['cometime']), time_format)
+    cometimeStr = str(b['cometime']) + ':00'
+    ct = datetime.strptime(cometimeStr, time_format)
     # print('cometime: ', ct)
-    timegap = (ct - now).seconds
-    if (timegap > 0 and timegap < 300):
-      busInfo += '* '
-    busInfo += str(b['cometime']) + ' - ' + str(b['stopname']) + ' \n'
+    timegap = (ct - now)
+    if (timegap.seconds > 0 and timegap.seconds < 200):
+      backStr += '* '
+    backStr += str(b['cometime']) + ' - ' + str(b['stopname']) + ' \n'
     # print('back: ', b)
-  busInfo += '*****************************' + '\n'
-  busInfo += 'Back to TAOYUAN' + '\n'
+
+  forwardStr += 'Back to TAOYUAN' + '\n'
   for f in route.forward:
-    busInfo += str(f['cometime']) + ' - ' + str(f['stopname']) + ' \n'
+    forwardStr += str(f['cometime']) + ' - ' + str(f['stopname']) + ' \n'
     # print('forward: ', f)
-  return busInfo
+  return (backStr, forwardStr)

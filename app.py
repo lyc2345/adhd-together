@@ -6,7 +6,7 @@ from linebot import (
   LineBotApi, WebhookHandler
 )
 from linebot.exceptions import (
-  InvalidSignatureError
+  InvalidSignatureError, LineBotApiError
 )
 from linebot.models import *
 
@@ -36,8 +36,8 @@ def callback():
   signature = request.headers['X-Line-Signature']
   # get request body as text
   body = request.get_data(as_text=True)
-   # app.logger.info('Request body: ' + body)
-   # app.logger.info('signature: ' + signature)
+  app.logger.info('Request body: ' + body)
+  app.logger.info('signature: ' + signature)
    # handle webhook body
   try:
     handler.handle(body, signature)
@@ -58,16 +58,66 @@ def callback():
 def handleMessage(event):
   # print('event.reply_token: ', event.reply_toke
   # print('event.message.text: ', event.message.text)
-  if event.message.text == "709":
-    content = getBusInformation('709')
-    line_bot_api.reply_message(
-      event.reply_token,
-      TextSendMessage(text=content)
+  # Command bus
+  if event.message.text == "bus":
+    bus_buttons_template = TemplateSendMessage(
+      alt_text = 'Buttons Templatesssss',
+      template = ButtonsTemplate(
+        title = 'Taoyuan Bus service',
+        text = 'Choose a route',
+        actions = [
+          MessageTemplateAction(
+            label = '709 To New TPE',
+            text = '#bus,709,0'
+          ),
+          MessageTemplateAction(
+            label = '709 Back To Longtan',
+            text = '#bus,709,1'
+          )
+        ]
+      )
     )
+    try:
+      line_bot_api.reply_message(event.reply_token, bus_buttons_template)
+    except LineBotApiError as error:
+      print('button template error', error.message)
     return 0
-  # line_bot_api.reply_message(
-  #   event.reply_token,
-  #   TextSendMessage(text=event.message.text + text))
+
+  # Handle command start with '#'
+  if event.message.text.startswith('#'):
+    if ',' in event.message.text:
+      query = event.message.text.split(',')
+      print('query: ', query)
+      if query[0].startswith('#bus'):
+        busId = query[1]
+        content = getBusInformation(busId)
+        if query[2] == '0':
+          content = content[0]
+        else:
+          content = content[1]
+
+        try:
+          line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content)
+          )
+        except LineBotApiError as error:
+          print('button template error', error)
+        return 0
+
+    query = event.message.text.strip('#')
+    print(query)
+    if query == "709":
+      content = getBusInformation('709')
+      contentStr = str(content[0]) + '\n****************************\n' + str(content[1])
+      try:
+        line_bot_api.reply_message(
+          event.reply_token,
+          TextSendMessage(text=contentStr)
+        )
+      except LineBotApiError as error:
+        print('button template error', error)
+      return 0
 
 if __name__ == "__main__":
   app.run(debug=True)
